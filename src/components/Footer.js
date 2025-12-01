@@ -1,41 +1,55 @@
-import React from 'react';
+import React from "react";
 
 const Footer = () => {
   return (
     <footer className="bg-dark text-light py-5 mt-auto">
       <div className="container">
-        <div className="row">
-          {/* Cột 1: Thông tin chung */}
-          <div className="col-md-4 mb-3">
-            <h5>My Cinema</h5>
-            <p className="text-muted">
-              Trải nghiệm điện ảnh tuyệt vời nhất với hệ thống âm thanh vòm và màn hình IMAX sắc nét.
-            </p>
-          </div>
+        <div className="row text-center text-md-start">
 
-          {/* Cột 2: Liên kết nhanh */}
+          {/* Cột 1: Tên đồ án + Thành viên */}
           <div className="col-md-4 mb-3">
-            <h5>Liên kết</h5>
+            <h5 className="fw-bold mb-3">📘 Bài tập lớn 2</h5>
+
+            <p className="text-light">
+              Website mô phỏng hệ thống quản lý rạp chiếu phim.
+            </p>
+
+            {/* Thành viên nhóm */}
+            <h6 className="fw-bold mt-3 mb-2 text-light">👥 Thành viên nhóm:</h6>
+
             <ul className="list-unstyled">
-              <li><a href="#" className="text-decoration-none text-muted">Về chúng tôi</a></li>
-              <li><a href="#" className="text-decoration-none text-muted">Thỏa thuận sử dụng</a></li>
-              <li><a href="#" className="text-decoration-none text-muted">Quy chế hoạt động</a></li>
+              <li className="text-light">• Nguyễn Chí Nhân – 2312430</li>
+              <li className="text-light">• Trần Đăng Khoa – 2311643</li>
+              <li className="text-light">• Nguyễn Đức Toàn – 2313485</li>
+              <li className="text-light">• Võ Đình Trí – 2313632</li>
+              <li className="text-light">• Phạm Quang Thành – 2313138</li>
             </ul>
           </div>
 
-          {/* Cột 3: Liên hệ */}
+
+
+          {/* Cột 2: Thông tin nhóm */}
           <div className="col-md-4 mb-3">
-            <h5>Liên hệ</h5>
-            <p className="text-muted mb-1">📞 Hotline: 1900 1234</p>
-            <p className="text-muted">📧 Email: support@mycinema.com</p>
+            <h5 className="fw-bold mb-3">Thông tin nhóm</h5>
+            <p className="mb-1"><strong>Nhóm:</strong> 2</p>
+            <p className="mb-1"><strong>Lớp:</strong> L02</p>
+            <p className="mb-1"><strong>Môn học:</strong> Hệ cơ sở dữ liệu</p>
+          </div>
+
+          {/* Cột 3: Giảng viên */}
+          <div className="col-md-4 mb-3">
+            <h5 className="fw-bold mb-3">Giảng viên hướng dẫn</h5>
+            <p className="mb-1">Trần Thị Quế Nguyệt</p>
+            <p className="text-muted">
+              Xin chân thành cảm ơn cô đã hướng dẫn và hỗ trợ nhóm trong quá trình thực hiện.
+            </p>
           </div>
         </div>
 
         <hr className="bg-secondary" />
-        
-        {/* Dòng bản quyền */}
-        <div className="text-center text-muted">
-          &copy; 2025 My Cinema. All rights reserved.
+
+        <div className="text-center text-muted mt-3">
+          © 2025 – Sản phẩm phục vụ học tập, không dùng cho mục đích thương mại.
         </div>
       </div>
     </footer>

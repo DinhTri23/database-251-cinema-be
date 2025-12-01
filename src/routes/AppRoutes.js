@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import MoviePage from "../pages/MoviePage";
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,7 @@ const AppRoutes = () => {
         <div className="flex-grow-1">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/movies" element={<MoviePage />} />
             {/* Các route khác... */}
           </Routes>
         </div>
