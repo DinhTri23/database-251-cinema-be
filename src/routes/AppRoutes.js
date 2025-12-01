@@ -8,6 +8,7 @@ import MovieRating from "../pages/MovieRating/MovieRating";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MoviePage from "../pages/MoviePage";
+import BranchPage from "../pages/BranchPage.js";
 
 const AppRoutes = () => {
   return (
@@ -24,6 +25,7 @@ const AppRoutes = () => {
             <Route path="/movies" element={<MoviePage />} />
             <Route path="/revenue-report" element={<RevenueReport />} />
             <Route path="/ticket-lookup" element={<TicketLookup />} />
+            <Route path="/branches" element={<BranchPage />} />
             <Route path="/customer-spending" element={<CustomerSpending />} />
             <Route path="/movie-rating" element={<MovieRating />} />
             {/* Các route khác... */}
