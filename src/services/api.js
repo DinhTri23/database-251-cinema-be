@@ -4,6 +4,13 @@ import axios from "axios";
 // BASE URL API
 const API_URL = "http://localhost:6868/api/movies";
 
+const api = axios.create({
+  baseURL: 'http://localhost:6868',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // ============================
 // 1) GET LIST MOVIES (search + sort + paging)
 // ============================
@@ -50,6 +57,7 @@ export const patchMovie = async (id, fields) => {
 export const deleteMovie = async (id) => {
   const res = await axios.delete(`${API_URL}/${id}`);
   return res.data;
+}
 export default api;
 /**
  * Lấy báo cáo doanh thu theo chi nhánh
