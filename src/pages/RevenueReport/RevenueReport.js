@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaSearch, FaFileExcel, FaSpinner } from 'react-icons/fa';
 // Import API từ services
-import { getBranchIncome } from '../../../services/api'; 
+import { getBranchIncome } from '../../services/api'; 
 // Import SCSS Module
 import styles from './RevenueReport.module.scss'; 
 
@@ -74,11 +74,11 @@ const RevenueReport = () => {
           <form onSubmit={handleSearch} className="row g-3 align-items-end">
             <div className="col-md-3">
               <label className="form-label fw-bold">Từ ngày</label>
-              <input type="date" className="form-control" name="fromDate" value={filters.fromDate} onChange={handleChange} required />
+              <input type="date" className="form-control" name="fromDate" value={filters.fromDate} onChange={handleChange} />
             </div>
             <div className="col-md-3">
               <label className="form-label fw-bold">Đến ngày</label>
-              <input type="date" className="form-control" name="toDate" value={filters.toDate} onChange={handleChange} required />
+              <input type="date" className="form-control" name="toDate" value={filters.toDate} onChange={handleChange} />
             </div>
             <div className="col-md-3">
               <label className="form-label fw-bold">Doanh thu tối thiểu</label>
