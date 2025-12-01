@@ -36,6 +36,9 @@ const Header = () => {
               <li className="nav-item">
                 <Link className="nav-link" to="/news">Tin tức</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/revenue-report">Báo cáo doanh thu</Link>
+              </li>
             </ul>
             
             {/* Nút Đăng nhập/Đăng ký */}
