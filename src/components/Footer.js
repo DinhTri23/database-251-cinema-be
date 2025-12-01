@@ -49,7 +49,7 @@ const Footer = () => {
           </div>
           <div className="mb-3 text-center">
             <h5 className="fw-bold mb-3">
-              Ước gì cô cho 10 điểm hihi! ò_Ó
+              Ước gì cô cho 10 điểm hihi ò_Ó
             </h5>
           </div>
         </div>

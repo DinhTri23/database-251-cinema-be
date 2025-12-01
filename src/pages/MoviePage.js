@@ -74,7 +74,7 @@ function MoviePage() {
   const [movies, setMovies] = useState([]);
   const [total, setTotal] = useState(0);
 
-  const pageSize = 5;
+  const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
   // FORM STATE
@@ -123,7 +123,7 @@ function MoviePage() {
 
   useEffect(() => {
     loadMovies();
-  }, [search, sortField, sortOrder, currentPage]);
+  }, [search, sortField, sortOrder, currentPage, pageSize]);
 
   // Clear any leftover modal/backdrop on mount
   useEffect(() => {
@@ -150,8 +150,14 @@ function MoviePage() {
 
   // CREATE MOVIE
   const handleCreate = async () => {
-    if (!form.MovieID.trim()) return alert("MovieID không được bỏ trống!");
-    if (!form.Title.trim()) return alert("Tên phim không được bỏ trống!");
+    if (!form.MovieID.trim()) return alert("MovieID khong duoc bo trong!");
+    if (!form.Title.trim()) return alert("Ten phim khong duoc de trong!");
+
+    const start = form.StartDate ? new Date(form.StartDate) : null;
+    const end = form.EndDate ? new Date(form.EndDate) : null;
+    if (start && end && start > end) {
+      return alert("Ngay bat dau khong duoc sau ngay ket thuc!");
+    }
 
     try {
       await createMovie(form);
@@ -169,6 +175,12 @@ function MoviePage() {
   // UPDATE MOVIE
   const handleUpdate = async () => {
     if (!form.Title.trim()) return alert("Ten phim khong duoc de trong!");
+
+    const start = form.StartDate ? new Date(form.StartDate) : null;
+    const end = form.EndDate ? new Date(form.EndDate) : null;
+    if (start && end && start > end) {
+      return alert("Ngay bat dau khong duoc sau ngay ket thuc!");
+    }
 
     const noChange =
       originalForm &&
@@ -221,7 +233,7 @@ function MoviePage() {
     }
   };
 
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   // ================================
   // RENDER UI
@@ -328,28 +340,47 @@ function MoviePage() {
       </table>
 
       {/* PAGINATION */}
-      <div className="d-flex justify-content-center align-items-center mt-4 mb-5">
-        <button
-          className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          <IoChevronBack size={20} />
-          Trước
-        </button>
-
-        <div className="mx-4" style={{ fontSize: "18px", fontWeight: "600" }}>
+      <div className="d-flex align-items-center gap-3 mt-4 mb-5">
+        <div>
           Trang {currentPage} / {totalPages}
         </div>
-
-        <button
-          className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Sau
-          <IoChevronForward size={20} />
-        </button>
+        <div className="btn-group">
+          <button
+            className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          >
+            <IoChevronBack size={20} />
+            Trước
+          </button>
+          <button
+            className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Sau
+            <IoChevronForward size={20} />
+          </button>
+        </div>
+        <div className="d-flex align-items-center gap-2 ms-auto">
+          <label className="mb-0">Page size</label>
+          <select
+            className="form-select"
+            style={{ width: "90px" }}
+            value={pageSize}
+            onChange={(e) => {
+              const val = Number(e.target.value) || 5;
+              setPageSize(val);
+              setCurrentPage(1);
+            }}
+          >
+            {[5, 10, 20, 50, 100].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* MODAL THÊM PHIM */}

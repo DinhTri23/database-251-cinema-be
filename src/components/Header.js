@@ -1,15 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const Header = () => {
+  const linkClass = ({ isActive }) => `nav-link px-3 ${isActive ? "active-nav" : ""}`;
+
   return (
     <header>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container">
+          <style>{`
+            .active-nav {
+              border-bottom: 2px solid #ffc107;
+              color: #ffffff !important;
+              font-weight: 700;
+            }
+          `}</style>
           {/* Logo / Brand */}
-          <Link className="navbar-brand" to="/">
+          <NavLink className="navbar-brand" to="/">
             🎬 My Cinema
-          </Link>
+          </NavLink>
 
           {/* Nút Toggle cho mobile */}
           <button 
@@ -28,32 +37,25 @@ const Header = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto"> {/* ms-auto đẩy menu sang phải */}
               <li className="nav-item">
-                <Link className="nav-link active" to="/">Trang chủ</Link>
+                <NavLink className="nav-link" to="/movies">Phim đang chiếu</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/movies">Phim đang chiếu</Link>
+                <NavLink className="nav-link" to="/branches">Chi nhánh</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/branches">Chi nhánh</Link>
+                <NavLink className="nav-link" to="/revenue-report">Báo cáo doanh thu</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/revenue-report">Báo cáo doanh thu</Link>
+                <NavLink className="nav-link" to="/ticket-lookup">Tra cứu vé</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/ticket-lookup">Tra cứu vé</Link>
+                <NavLink className="nav-link" to="/customer-spending">Tra cứu chi tiêu</NavLink>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/customer-spending">Tra cứu chi tiêu</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/movie-rating">Đánh giá phim</Link>
+                <NavLink className="nav-link" to="/movie-rating">Đánh giá phim</NavLink>
               </li>
             </ul>
-            
-            {/* Nút Đăng nhập/Đăng ký */}
-            <div className="d-flex ms-3">
-                <button className="btn btn-outline-warning btn-sm">Đăng nhập</button>
-            </div>
+          
           </div>
         </div>
       </nav>

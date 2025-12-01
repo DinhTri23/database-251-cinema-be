@@ -1,9 +1,9 @@
 const Home = () => {
   return (
     <>
-      <p>Hello AKNR++! Mình là KaTran (độc thân) hehe</p>
+      <h3>Môn Hệ cơ sở dữ liệu</h3>
       <p>
-        Notes: bootstrap + react-router-dom + react-icons + axios + scss(module)
+        Nhóm 2 - L02 xin giới thiệu website mô phỏng hệ thống quản lý rạp chiếu phim.
       </p>
     </>
   );

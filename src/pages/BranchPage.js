@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Modal } from "bootstrap";
 
@@ -80,15 +80,15 @@ const parseError = (err) => {
 
 const validateForm = (form, { requireId }) => {
   if (requireId && !form.BranchID.trim()) {
-    return "BranchID khong duoc de trong";
+    return "BranchID không được để trống";
   }
-  if (!form.Name.trim()) return "Name khong duoc de trong";
-  if (!form.Address.trim()) return "Address khong duoc de trong";
-  if (!form.ContactNumber.trim()) return "ContactNumber khong duoc de trong";
-  if (!/^[0-9]{9,11}$/.test(form.ContactNumber.trim())) {
-    return "ContactNumber chi duoc chua so (9-11 ky tu)";
+  if (!form.Name.trim()) return "Tên chi nhánh không được để trống";
+  if (!form.Address.trim()) return "Địa chỉ không được để trống";
+  if (!form.ContactNumber.trim()) return "ContactNumber không được để trống";
+  if (!/^0[0-9]{8,10}$/.test(form.ContactNumber.trim())) {
+    return "Lỗi khi cập nhật thông tin ContactNumber";
   }
-  return null;
+    return null;
 };
 
 function BranchPage() {
@@ -105,11 +105,19 @@ function BranchPage() {
   const [form, setForm] = useState(emptyForm);
   const [originalForm, setOriginalForm] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(total / pageSize)),
     [total, pageSize]
   );
+
+  const showToast = (message, variant = "info", duration = 3000) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ message, variant });
+    toastTimer.current = setTimeout(() => setToast(null), duration);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -141,28 +149,33 @@ function BranchPage() {
   }, []);
 
   const resetForm = () => {
+    setToast(null);
     setForm(emptyForm);
     setOriginalForm(null);
     setEditingId(null);
   };
 
   const handleCreate = async () => {
+    setToast(null);
     const msg = validateForm(form, { requireId: true });
-    if (msg) return alert(msg);
+    if (msg) return showToast(msg, "warning");
     try {
       await createBranch(form);
       resetForm();
       cleanupModal("branchAddModal");
       await loadData();
-      alert("Them chi nhanh thanh cong!");
+      showToast("Thêm chi nhánh thành công!", "success");
     } catch (err) {
-      alert(parseError(err));
+      showToast(parseError(err), "danger");
     }
   };
 
   const handleUpdate = async () => {
+    setToast(null);
     const msg = validateForm(form, { requireId: false });
-    if (msg) return alert(msg);
+    if (msg) {
+      return showToast(msg, "warning");
+    }
     if (!editingId) return;
 
     const noChange =
@@ -170,7 +183,9 @@ function BranchPage() {
       Object.keys(form).every(
         (key) => String(form[key] ?? "") === String(originalForm[key] ?? "")
       );
-    if (noChange) return alert("Ban chua co thay doi gi");
+    if (noChange) {
+      return showToast("Bạn chưa có thay đổi gì", "warning");
+    }
 
     try {
       await updateBranch(editingId, {
@@ -181,13 +196,15 @@ function BranchPage() {
       resetForm();
       cleanupModal("branchEditModal");
       await loadData();
-      alert("Cap nhat chi nhanh thanh cong!");
+      showToast("Cập nhật chi nhánh thành công!", "success");
     } catch (err) {
-      alert(parseError(err));
+      const parsed = parseError(err);
+      showToast(parsed, "danger");
     }
   };
 
   const handlePatch = async () => {
+    setToast(null);
     if (!editingId) return;
     const changed = {};
     Object.keys(form).forEach((key) => {
@@ -196,25 +213,29 @@ function BranchPage() {
       }
     });
     if (Object.keys(changed).length === 0) {
-      return alert("Ban chua thay doi gi de cap nhat nhanh");
+      return showToast("Bạn chưa có thay đổi gì", "warning");
     }
 
     const merged = { ...(originalForm || {}), ...changed };
     const msg = validateForm(merged, { requireId: false });
-    if (msg) return alert(msg);
+    if (msg) {
+      return showToast(msg, "warning");
+    }
 
     try {
       await patchBranch(editingId, changed);
       resetForm();
       cleanupModal("branchEditModal");
       await loadData();
-      alert("Cap nhat nhanh thanh cong!");
+      showToast("Cập nhật nhanh thành công!", "success");
     } catch (err) {
-      alert(parseError(err));
+      const parsed = parseError(err);
+      showToast(parsed, "danger");
     }
   };
 
   const handleEdit = (branch) => {
+    setToast(null);
     cleanupModalArtifacts();
     setEditingId(branch.BranchID);
     setForm({
@@ -232,12 +253,12 @@ function BranchPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Ban chac chan muon xoa chi nhanh nay?")) return;
+    if (!window.confirm("Bạn chắc chắn muốn xóa chi nhánh này?")) return;
     try {
       await deleteBranch(id);
       await loadData();
     } catch (err) {
-      alert(parseError(err));
+      showToast(parseError(err), "danger");
     }
   };
 
@@ -256,7 +277,15 @@ function BranchPage() {
   };
 
   return (
-    <div className="container mt-4 mb-5">
+    <div className="container mt-4 mb-5 position-relative">
+      {toast && (
+        <div
+          className={`alert alert-${toast.variant} position-fixed`}
+          style={{ top: "20px", right: "20px", minWidth: "260px", zIndex: 1056 }}
+        >
+          {toast.message}
+        </div>
+      )}
       <h2 className="mb-4">Quản lý chi nhánh</h2>
 
       <div className="d-flex gap-2 mb-3">
@@ -417,9 +446,6 @@ function BranchPage() {
               <BranchForm form={form} setForm={setForm} disableId={true} />
             </div>
             <div className="modal-footer d-flex justify-content-between">
-              <button className="btn btn-outline-secondary" onClick={handlePatch}>
-                Lưu nhanh (PATCH)
-              </button>
               <div className="d-flex gap-2">
                 <button className="btn btn-secondary" data-bs-dismiss="modal">
                   Hủy
