@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Modal } from "bootstrap";
 import {
   getMovies,
   createMovie,
@@ -22,6 +23,53 @@ function normalizeMovieForForm(movie) {
   };
 }
 
+const renderDateTime = (value) => {
+  if (!value) return "";
+  const dateObj = new Date(value);
+  if (Number.isNaN(dateObj.getTime())) return value;
+
+  const date = dateObj.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+  const time = dateObj.toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  });
+
+  return (
+    <div style={{ whiteSpace: "nowrap", lineHeight: "1.2" }}>
+      <div>{date}</div>
+      <div style={{ color: "#555" }}>{time}</div>
+    </div>
+  );
+};
+
+const cleanupModalArtifacts = () => {
+  // remove leftovers if Bootstrap backdrop sticks around
+  document.body.classList.remove("modal-open");
+  document
+    .querySelectorAll(".modal-backdrop")
+    .forEach((el) => el.parentNode?.removeChild(el));
+};
+
+const hideModalById = (id) => {
+  const modalEl = document.getElementById(id);
+  if (!modalEl) {
+    cleanupModalArtifacts();
+    return;
+  }
+
+  const instance = Modal.getOrCreateInstance(modalEl);
+  instance.hide();
+
+  // defer cleanup so Bootstrap can finish its own hide transition
+  setTimeout(cleanupModalArtifacts, 200);
+};
+
 function MoviePage() {
   const [movies, setMovies] = useState([]);
   const [total, setTotal] = useState(0);
@@ -42,6 +90,8 @@ function MoviePage() {
     Summary: "",
     Director: ""
   });
+  const [originalForm, setOriginalForm] = useState(null);
+
 
   const [editingId, setEditingId] = useState(null);
 
@@ -75,6 +125,11 @@ function MoviePage() {
     loadMovies();
   }, [search, sortField, sortOrder, currentPage]);
 
+  // Clear any leftover modal/backdrop on mount
+  useEffect(() => {
+    cleanupModalArtifacts();
+  }, []);
+
   // RESET FORM
   const resetForm = () => {
     setForm({
@@ -89,6 +144,7 @@ function MoviePage() {
       Summary: "",
       Director: ""
     });
+    setOriginalForm(null);
     setEditingId(null);
   };
 
@@ -102,9 +158,8 @@ function MoviePage() {
       resetForm();
       loadMovies();
 
-      window.bootstrap.Modal.getInstance(
-        document.getElementById("addMovieModal")
-      ).hide();
+      hideModalById("addMovieModal");
+      alert("Them phim thanh cong!");
 
     } catch (err) {
       alert(err.response?.data?.error || "Lỗi khi thêm phim!");
@@ -113,7 +168,14 @@ function MoviePage() {
 
   // UPDATE MOVIE
   const handleUpdate = async () => {
-    if (!form.Title.trim()) return alert("Tên phim không được bỏ trống!");
+    if (!form.Title.trim()) return alert("Ten phim khong duoc de trong!");
+
+    const noChange =
+      originalForm &&
+      Object.keys(form).every(
+        (key) => String(form[key] ?? "") === String(originalForm[key] ?? "")
+      );
+    if (noChange) return alert("Ban chua co thay doi gi!");
 
     try {
       await updateMovie(editingId, form);
@@ -121,18 +183,20 @@ function MoviePage() {
       resetForm();
       loadMovies();
 
-      window.bootstrap.Modal.getInstance(
-        document.getElementById("editMovieModal")
-      ).hide();
+      hideModalById("editMovieModal");
+      alert("Cap nhat phim thanh cong!");
 
     } catch (err) {
-      alert(err.response?.data?.error || "Lỗi khi cập nhật phim!");
+      alert(err.response?.data?.error || "Loi khi cap nhat phim!");
     }
   };
 
   // Khi bấm Sửa
   const handleEdit = (movie) => {
-    setForm(normalizeMovieForForm(movie)); // ✅ convert ngày về YYYY-MM-DD
+    cleanupModalArtifacts();
+    const normalized = normalizeMovieForForm(movie);
+    setForm(normalized); // convert date to YYYY-MM-DD
+    setOriginalForm(normalized);
     setEditingId(movie.MovieID);
   };
 
@@ -181,7 +245,10 @@ function MoviePage() {
           className="btn btn-primary ms-auto"
           data-bs-toggle="modal"
           data-bs-target="#addMovieModal"
-          onClick={resetForm}
+          onClick={() => {
+            cleanupModalArtifacts();
+            resetForm();
+          }}
         >
           + Thêm phim
         </button>
@@ -195,8 +262,8 @@ function MoviePage() {
               Tên phim {sortField === "Title" && (sortOrder === "asc" ? "▲" : "▼")}
             </th>
 
-            <th onClick={() => handleSortToggle("Language")} style={{ cursor: "pointer" }}>
-              Đạo diễn {sortField === "Language" && (sortOrder === "asc" ? "▲" : "▼")}
+            <th onClick={() => handleSortToggle("Director")} style={{ cursor: "pointer" }}>
+              Đạo diễn {sortField === "Director" && (sortOrder === "asc" ? "▲" : "▼")}
             </th>
 
             <th onClick={() => handleSortToggle("StartDate")} style={{ cursor: "pointer" }}>
@@ -230,8 +297,8 @@ function MoviePage() {
             <tr key={m.MovieID}>
               <td>{m.Title}</td>
               <td>{m.Director}</td>
-              <td>{m.StartDate}</td>
-              <td>{m.EndDate}</td>
+              <td>{renderDateTime(m.StartDate)}</td>
+              <td>{renderDateTime(m.EndDate)}</td>
               <td>{m.ProductionYear}</td>
               <td>{m.AgeRestriction}</td>
               <td>{m.Duration}</td>
