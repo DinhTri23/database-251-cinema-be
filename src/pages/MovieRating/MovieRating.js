@@ -1,26 +1,86 @@
 import React, { useState } from 'react';
 import { FaSearch, FaStar, FaSpinner } from 'react-icons/fa';
-import { getMovieRatingSummary } from '../../services/api';
+import { getMovieRatingSummary, searchMoviesByName } from '../../services/api';
 import styles from './MovieRating.module.scss';
 
 const MovieRating = () => {
   const [movieId, setMovieId] = useState('');
+  const [movieName, setMovieName] = useState('');
   const [minReviewCount, setMinReviewCount] = useState(1);
   const [ratingInfo, setRatingInfo] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleSearchByName = async () => {
+    if (!movieName.trim()) {
+      setError('Vui lòng nhập tên phim');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSearchResults([]);
+
+    try {
+      const results = await searchMoviesByName(movieName.trim());
+      if (results.length === 0) {
+        setError('Không tìm thấy phim nào');
+      } else {
+        setSearchResults(results);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Lỗi khi tìm kiếm phim');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectMovie = async (selectedMovieId) => {
+    setMovieId(selectedMovieId);
+    setSearchResults([]);
+    
+    setLoading(true);
+    setError(null);
+    setRatingInfo(null);
+
+    try {
+      const data = await getMovieRatingSummary(selectedMovieId, minReviewCount);
+      setRatingInfo(data);
+    } catch (err) {
+      console.error(err);
+      if (err.response && err.response.status === 404) {
+        setError('Không tìm thấy phim với mã này');
+      } else if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Lỗi kết nối hoặc không tải được dữ liệu');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async (e) => {
     e.preventDefault();
-    
+
+    // Nếu có tên phim, tìm theo tên
+    if (movieName.trim()) {
+      handleSearchByName();
+      return;
+    }
+
+    // Nếu không có tên phim, tìm theo mã
     if (!movieId.trim()) {
-      setError('Vui lòng nhập mã phim');
+      setError('Vui lòng nhập mã phim hoặc tên phim');
       return;
     }
 
     setLoading(true);
     setError(null);
     setRatingInfo(null);
+    setSearchResults([]);
 
     try {
       const data = await getMovieRatingSummary(movieId.trim(), minReviewCount);
@@ -37,9 +97,7 @@ const MovieRating = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const renderStars = (rating) => {
+  };  const renderStars = (rating) => {
     if (!rating) return null;
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -73,7 +131,7 @@ const MovieRating = () => {
       <div className={`card mb-4 ${styles.searchCard}`}>
         <div className="card-body">
           <form onSubmit={handleSearch} className="row g-3 align-items-end">
-            <div className="col-md-6">
+            <div className="col-md-4">
               <label className="form-label fw-bold">Mã phim</label>
               <input
                 type="text"
@@ -84,7 +142,18 @@ const MovieRating = () => {
                 disabled={loading}
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-4">
+              <label className="form-label fw-bold">Tên phim</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Nhập tên phim"
+                value={movieName}
+                onChange={(e) => setMovieName(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <div className="col-md-2">
               <label className="form-label fw-bold">Số đánh giá tối thiểu</label>
               <input
                 type="number"
@@ -95,7 +164,7 @@ const MovieRating = () => {
                 disabled={loading}
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-2">
               <button 
                 type="submit" 
                 className="btn btn-primary w-100" 
@@ -106,7 +175,7 @@ const MovieRating = () => {
                 ) : (
                   <>
                     <FaSearch className="me-2" />
-                    Xem đánh giá
+                    Tìm kiếm
                   </>
                 )}
               </button>
@@ -114,6 +183,26 @@ const MovieRating = () => {
           </form>
         </div>
       </div>
+
+      {/* Search Results */}
+      {searchResults.length > 0 && (
+        <div className={`card mb-4 ${styles.searchResultsCard}`}>
+          <div className="card-header bg-info text-white">
+            <h6 className="mb-0">Kết quả tìm kiếm ({searchResults.length})</h6>
+          </div>
+          <div className="list-group list-group-flush">
+            {searchResults.map((movie) => (
+              <button
+                key={movie.MovieID}
+                className="list-group-item list-group-item-action"
+                onClick={() => handleSelectMovie(movie.MovieID)}
+              >
+                <strong>{movie.MovieID}</strong> - {movie.Title}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (

@@ -131,3 +131,20 @@ export const getMovieRatingSummary = async (movieId, minReviewCount = 1) => {
     throw error;
   }
 };
+
+/**
+ * Tìm kiếm phim theo tên
+ * @param {string} name - Tên phim
+ * @returns {Promise} - Danh sách phim
+ */
+export const searchMoviesByName = async (name) => {
+  try {
+    const response = await api.get('/api/movie-ratings/search', {
+      params: { name }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error searching movies:', error);
+    throw error;
+  }
+};
