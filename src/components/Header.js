@@ -42,6 +42,12 @@ const Header = () => {
               <li className="nav-item">
                 <Link className="nav-link" to="/ticket-lookup">Tra cứu vé</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/customer-spending">Tra cứu chi tiêu</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/movie-rating">Đánh giá phim</Link>
+              </li>
             </ul>
             
             {/* Nút Đăng nhập/Đăng ký */}

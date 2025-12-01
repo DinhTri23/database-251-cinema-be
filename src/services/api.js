@@ -45,3 +45,38 @@ export const getTicketById = async (ticketId) => {
     throw error;
   }
 };
+
+/**
+ * Cập nhật tổng chi tiêu của khách hàng
+ * @param {string} customerId - Mã khách hàng
+ * @returns {Promise} - Thông tin khách hàng sau khi cập nhật
+ */
+export const updateCustomerSpending = async (customerId) => {
+  try {
+    const response = await api.put(`/api/customers/${customerId}/update-spending`);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating customer spending:', error);
+    throw error;
+  }
+};
+
+/**
+ * Lấy tổng hợp đánh giá của phim
+ * @param {string} movieId - Mã phim
+ * @param {number} minReviewCount - Số lượng đánh giá tối thiểu (optional)
+ * @returns {Promise} - Thông tin đánh giá phim
+ */
+export const getMovieRatingSummary = async (movieId, minReviewCount = 1) => {
+  try {
+    const response = await api.get(`/api/movie-ratings/${movieId}`, {
+      params: {
+        minReviewCount
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching movie rating summary:', error);
+    throw error;
+  }
+};
