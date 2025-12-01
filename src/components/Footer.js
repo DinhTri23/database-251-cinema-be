@@ -40,16 +40,24 @@ const Footer = () => {
           <div className="col-md-4 mb-3">
             <h5 className="fw-bold mb-3">Giảng viên hướng dẫn</h5>
             <p className="mb-1">Trần Thị Quế Nguyệt</p>
-            <p className="text-muted">
-              Xin chân thành cảm ơn cô đã hướng dẫn và hỗ trợ nhóm trong quá trình thực hiện.
+            <p className="mb-1">
+              Qua môn này nhóm em đã học được rất nhiều về cách thiết kế database cũng như làm giao diện website cơ bản. 
             </p>
+            <p className="mb-1">
+              Xin chân thành cảm ơn cô đã hướng dẫn và hỗ trợ nhóm trong quá trình thực hiện!
+            </p>
+          </div>
+          <div className="mb-3 text-center">
+            <h5 className="fw-bold mb-3">
+              Ước gì cô cho 10 điểm hihi! ò_Ó
+            </h5>
           </div>
         </div>
 
         <hr className="bg-secondary" />
 
-        <div className="text-center text-muted mt-3">
-          © 2025 – Sản phẩm phục vụ học tập, không dùng cho mục đích thương mại.
+        <div className="text-center mt-3">
+          © 2025 – Sản phẩm phục vụ học tập, không dùng cho mục đích thương mại. 
         </div>
       </div>
     </footer>

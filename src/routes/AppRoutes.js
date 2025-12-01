@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import RevenueReport from "../pages/RevenueReport/RevenueReport.js";
 import TicketLookup from "../pages/TicketLookup/TicketLookup";
+import CustomerSpending from "../pages/CustomerSpending/CustomerSpending";
+import MovieRating from "../pages/MovieRating/MovieRating";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MoviePage from "../pages/MoviePage";
@@ -24,6 +26,8 @@ const AppRoutes = () => {
             <Route path="/revenue-report" element={<RevenueReport />} />
             <Route path="/ticket-lookup" element={<TicketLookup />} />
             <Route path="/branches" element={<BranchPage />} />
+            <Route path="/customer-spending" element={<CustomerSpending />} />
+            <Route path="/movie-rating" element={<MovieRating />} />
             {/* Các route khác... */}
           </Routes>
         </div>

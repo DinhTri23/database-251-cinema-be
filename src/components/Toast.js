@@ -1,0 +1,25 @@
+import React, { useEffect } from 'react';
+import styles from './Toast.module.scss';
+
+const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [duration, onClose]);
+
+  return (
+    <div className={`${styles.toast} ${styles[type]}`}>
+      <div className={styles.toastContent}>
+        {type === 'success' && <span className={styles.icon}>✓</span>}
+        {type === 'error' && <span className={styles.icon}>✕</span>}
+        <span className={styles.message}>{message}</span>
+      </div>
+      <button className={styles.closeBtn} onClick={onClose}>×</button>
+    </div>
+  );
+};
+
+export default Toast;
