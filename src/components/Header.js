@@ -34,7 +34,7 @@ const Header = () => {
                 <Link className="nav-link" to="/movies">Phim đang chiếu</Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/news">Tin tức</Link>
+                <Link className="nav-link" to="/branches">Chi nhánh</Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/revenue-report">Báo cáo doanh thu</Link>
