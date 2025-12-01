@@ -1,0 +1,30 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "../pages/Home/Home";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+
+const AppRoutes = () => {
+  return (
+    <Router>
+      {/* Bao bọc toàn bộ bằng div này để Footer luôn ở đáy */}
+      <div className="d-flex flex-column min-vh-100">
+        
+        <Header />
+
+        {/* Nội dung chính sẽ giãn ra để lấp đầy khoảng trống (flex-grow-1) */}
+        <div className="flex-grow-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            {/* Các route khác... */}
+          </Routes>
+        </div>
+
+        <Footer />
+        
+      </div>
+    </Router>
+  );
+};
+
+export default AppRoutes;
