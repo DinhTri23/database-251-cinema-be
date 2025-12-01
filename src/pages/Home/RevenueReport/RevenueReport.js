@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaSearch, FaFileExcel, FaSpinner } from 'react-icons/fa';
-// Import Service đã tách ra (Bước 2)
-import { getBranchIncome } from '../../../services/reportService'; 
+// Import API từ services
+import { getBranchIncome } from '../../../services/api'; 
 // Import SCSS Module
 import styles from './RevenueReport.module.scss'; 
 
