@@ -63,10 +63,10 @@ const emptyForm = {
 };
 
 const sortOptions = [
-  { key: "branchid", label: "BranchID" },
-  { key: "name", label: "Name" },
-  { key: "address", label: "Address" },
-  { key: "contactnumber", label: "ContactNumber" }
+  { key: "branchid", label: "Mã chi nhánh" },
+  { key: "name", label: "Tên chi nhánh" },
+  { key: "address", label: "Địa chỉ" },
+  { key: "contactnumber", label: "Số liên hệ" }
 ];
 
 const parseError = (err) => {
@@ -276,6 +276,42 @@ function BranchPage() {
     return sortDir === "asc" ? "▲" : "▼";
   };
 
+  // EXPORT TO CSV
+  const handleExportCSV = () => {
+    if (branches.length === 0) {
+      alert("Không có dữ liệu để xuất!");
+      return;
+    }
+
+    // CSV headers
+    const headers = [
+      "Mã chi nhánh",
+      "Tên chi nhánh",
+      "Địa chỉ",
+      "Số điện thoại"
+    ];
+
+    // CSV rows
+    const rows = branches.map(b => [
+      b.BranchID,
+      `\"${b.Name}\"`,,
+      `\"${b.Address}\"`,,
+      b.ContactNumber
+    ]);
+
+    // Create CSV content
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    
+    // Create blob and download
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `DanhSachChiNhanh_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="container mt-4 mb-5 position-relative">
       {toast && (
@@ -286,7 +322,7 @@ function BranchPage() {
           {toast.message}
         </div>
       )}
-      <h2 className="mb-4">Quản lý chi nhánh</h2>
+      <h2 className="mb-4 text-center text-primary fw-bold">🏢 Quản lý chi nhánh</h2>
 
       <div className="d-flex gap-2 mb-3">
         <input
@@ -299,7 +335,15 @@ function BranchPage() {
           }}
         />
         <button
-          className="btn btn-primary ms-auto"
+          className="btn btn-success"
+          onClick={handleExportCSV}
+          title="Xuất ra CSV"
+          disabled={branches.length === 0}
+        >
+          📊 Xuất CSV
+        </button>
+        <button
+          className="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#branchAddModal"
           onClick={() => {
@@ -307,7 +351,7 @@ function BranchPage() {
             resetForm();
           }}
         >
-          + Thêm chi nhánh
+          Thêm chi nhánh
         </button>
       </div>
 
@@ -318,14 +362,21 @@ function BranchPage() {
       )}
 
       <div className="table-responsive">
-        <table className="table table-bordered table-hover">
+        <table className="table table-bordered table-hover" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '25%' }} />
+            <col style={{ width: '35%' }} />
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '10%' }} />
+          </colgroup>
           <thead className="table-dark">
             <tr>
               {sortOptions.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col.key)}
-                  style={{ cursor: "pointer", whiteSpace: "nowrap" }}
+                  style={{ cursor: "pointer", whiteSpace: "nowrap", userSelect: "none" }}
                 >
                   {col.label} {renderSortIcon(col.key)}
                 </th>
@@ -466,7 +517,7 @@ function BranchForm({ form, setForm, disableId }) {
   return (
     <div className="d-flex flex-column gap-3">
       <div>
-        <label className="form-label">BranchID</label>
+        <label className="form-label">Mã chi nhánh</label>
         <input
           className="form-control"
           value={form.BranchID}
@@ -475,7 +526,7 @@ function BranchForm({ form, setForm, disableId }) {
         />
       </div>
       <div>
-        <label className="form-label">Name</label>
+        <label className="form-label">Tên chi nhánh</label>
         <input
           className="form-control"
           value={form.Name}
@@ -483,7 +534,7 @@ function BranchForm({ form, setForm, disableId }) {
         />
       </div>
       <div>
-        <label className="form-label">Address</label>
+        <label className="form-label">Địa chỉ</label>
         <input
           className="form-control"
           value={form.Address}
@@ -491,7 +542,7 @@ function BranchForm({ form, setForm, disableId }) {
         />
       </div>
       <div>
-        <label className="form-label">ContactNumber</label>
+        <label className="form-label">Số liên hệ</label>
         <input
           className="form-control"
           value={form.ContactNumber}

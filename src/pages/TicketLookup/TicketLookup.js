@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch, FaTicketAlt, FaSpinner } from "react-icons/fa";
 import { getTicketById } from "../../services/api";
 import styles from "./TicketLookup.module.scss";
@@ -8,6 +8,16 @@ const TicketLookup = () => {
   const [ticketInfo, setTicketInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Auto-hide error after 3 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -120,48 +130,81 @@ const TicketLookup = () => {
 
       {/* Ticket Info Display */}
       {ticketInfo && (
-        <div className={`card ${styles.ticketCard}`}>
-          <div className="card-header bg-primary text-white">
-            <h5 className="mb-0">
-              <FaTicketAlt className="me-2" />
-              Thông Tin Vé
-            </h5>
-          </div>
-          <div className="card-body">
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <strong>Phim:</strong>
-                <p className="text-primary fs-5 mb-0">{ticketInfo.Title}</p>
-              </div>
-              <div className="col-md-6 mb-3">
-                <strong>Rạp:</strong>
-                <p className="mb-0">{ticketInfo.Name}</p>
-              </div>
-              <div className="col-md-4 mb-3">
-                <strong>Phòng chiếu:</strong>
-                <p className="mb-0">{ticketInfo.RoomID}</p>
-              </div>
-              <div className="col-md-4 mb-3">
-                <strong>Ghế ngồi:</strong>
-                <p className="mb-0 badge bg-info fs-6">{ticketInfo.SeatID}</p>
-              </div>
-              <div className="col-md-4 mb-3">
-                <strong>Giá vé:</strong>
-                <p className="mb-0 text-success fw-bold fs-5">
-                  {formatVND(ticketInfo.ActualPrice)}
-                </p>
-              </div>
-              <div className="col-md-6 mb-3">
-                <strong>Giờ bắt đầu:</strong>
-                <p className="mb-0">{formatTime(ticketInfo.StartTime)}</p>
-              </div>
-              <div className="col-md-6 mb-3">
-                <strong>Giờ kết thúc:</strong>
-                <p className="mb-0">{formatTime(ticketInfo.EndTime)}</p>
+        <>
+          <div className={`card ${styles.ticketCard} mb-3`}>
+            <div className="card-header bg-primary text-white">
+              <h5 className="mb-0">
+                <FaTicketAlt className="me-2" />
+                Thông Tin Vé
+              </h5>
+            </div>
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <strong>Phim:</strong>
+                  <p className="text-primary fs-5 mb-0">{ticketInfo.Title}</p>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <strong>Rạp:</strong>
+                  <p className="mb-0">{ticketInfo.Name}</p>
+                </div>
+                <div className="col-md-4 mb-3">
+                  <strong>Phòng chiếu:</strong>
+                  <p className="mb-0">{ticketInfo.RoomID}</p>
+                </div>
+                <div className="col-md-4 mb-3">
+                  <strong>Ghế ngồi:</strong>
+                  <p className="mb-0 badge bg-info fs-6">{ticketInfo.SeatID}</p>
+                </div>
+                <div className="col-md-4 mb-3">
+                  <strong>Giá vé:</strong>
+                  <p className="mb-0 text-success fw-bold fs-5">
+                    {formatVND(ticketInfo.ActualPrice)}
+                  </p>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <strong>Giờ bắt đầu:</strong>
+                  <p className="mb-0">{formatTime(ticketInfo.StartTime)}</p>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <strong>Giờ kết thúc:</strong>
+                  <p className="mb-0">{formatTime(ticketInfo.EndTime)}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Customer Info Card */}
+          {ticketInfo.Customer && (
+            <div className={`card ${styles.ticketCard}`}>
+              <div className="card-header bg-success text-white">
+                <h5 className="mb-0">
+                  👤 Thông Tin Khách Hàng
+                </h5>
+              </div>
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-md-3 mb-3">
+                    <strong>Mã khách hàng:</strong>
+                    <p className="mb-0">{ticketInfo.Customer.CustomerID}</p>
+                  </div>
+                  <div className="col-md-3 mb-3">
+                    <strong>Họ tên:</strong>
+                    <p className="mb-0 text-primary fs-5">{ticketInfo.Customer.FullName}</p>
+                  </div>
+                  <div className="col-md-3 mb-3">
+                    <strong>Số điện thoại:</strong>
+                    <p className="mb-0">{ticketInfo.Customer.Phone}</p>
+                  </div>
+                  <div className="col-md-3 mb-3">
+                    <strong>Email:</strong>
+                    <p className="mb-0">{ticketInfo.Customer.Email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* No Data Message */}

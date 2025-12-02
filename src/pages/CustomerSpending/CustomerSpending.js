@@ -32,8 +32,18 @@ const CustomerSpending = () => {
       
       if (err.response && err.response.status === 404) {
         errorMsg = 'Không tìm thấy khách hàng với mã này';
-      } else if (err.response && err.response.data && err.response.data.error) {
-        errorMsg = err.response.data.error;
+      } else if (err.response && err.response.data) {
+        // Extract user-friendly message from SQL error
+        if (typeof err.response.data.error === 'string') {
+          const sqlError = err.response.data.error;
+          if (sqlError.includes('không tồn tại')) {
+            errorMsg = 'Không tìm thấy khách hàng với mã này';
+          } else if (sqlError.includes('Invalid column name')) {
+            errorMsg = 'Lỗi cấu trúc dữ liệu. Vui lòng liên hệ quản trị viên';
+          } else {
+            errorMsg = 'Có lỗi xảy ra. Vui lòng thử lại';
+          }
+        }
       }
       
       setToast({ message: errorMsg, type: 'error' });

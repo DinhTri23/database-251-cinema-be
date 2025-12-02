@@ -12,6 +12,8 @@ const RevenueReport = () => {
     minRevenue: 0
   });
   const [reportData, setReportData] = useState([]);
+  const [sortBy, setSortBy] = useState('branchid');
+  const [sortDir, setSortDir] = useState('asc');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -61,6 +63,50 @@ const RevenueReport = () => {
     link.click();
   };
 
+  const toggleSort = (field) => {
+    if (sortBy === field) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortDir('asc');
+    }
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortBy !== field) return null;
+    return sortDir === 'asc' ? '▲' : '▼';
+  };
+
+  const getSortedData = () => {
+    if (!reportData || reportData.length === 0) return [];
+    const sorted = [...reportData];
+    
+    switch (sortBy) {
+      case 'branchid':
+        return sorted.sort((a, b) => {
+          const compare = a.BranchID.localeCompare(b.BranchID);
+          return sortDir === 'asc' ? compare : -compare;
+        });
+      case 'branchname':
+        return sorted.sort((a, b) => {
+          const compare = a.BranchName.localeCompare(b.BranchName);
+          return sortDir === 'asc' ? compare : -compare;
+        });
+      case 'revenue':
+        return sorted.sort((a, b) => {
+          const compare = a.TotalRevenue - b.TotalRevenue;
+          return sortDir === 'asc' ? compare : -compare;
+        });
+      case 'tickets':
+        return sorted.sort((a, b) => {
+          const compare = a.TotalTicket - b.TotalTicket;
+          return sortDir === 'asc' ? compare : -compare;
+        });
+      default:
+        return sorted;
+    }
+  };
+
   // Helper format tiền
   const formatVND = (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
@@ -100,18 +146,32 @@ const RevenueReport = () => {
 
       {/* Table Section */}
       <div className="table-responsive shadow-sm rounded">
-        <table className="table table-hover table-bordered mb-0">
+        <table className="table table-hover table-bordered mb-0" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '28%' }} />
+          </colgroup>
           <thead className="table-dark text-center">
             <tr>
-              <th>Mã CN</th>
-              <th>Tên Chi Nhánh</th>
-              <th>Tổng Doanh Thu</th>
-              <th>Tổng Số Vé</th>
+              <th onClick={() => toggleSort('branchid')} style={{ cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                Mã CN {renderSortIcon('branchid')}
+              </th>
+              <th onClick={() => toggleSort('branchname')} style={{ cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                Tên Chi Nhánh {renderSortIcon('branchname')}
+              </th>
+              <th onClick={() => toggleSort('revenue')} style={{ cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                Tổng Doanh Thu {renderSortIcon('revenue')}
+              </th>
+              <th onClick={() => toggleSort('tickets')} style={{ cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                Tổng Số Vé {renderSortIcon('tickets')}
+              </th>
             </tr>
           </thead>
           <tbody>
-            {reportData.length > 0 ? (
-              reportData.map((item, index) => (
+            {getSortedData().length > 0 ? (
+              getSortedData().map((item, index) => (
                 <tr key={index}>
                   <td className="text-center">{item.BranchID}</td>
                   <td>{item.BranchName}</td>
