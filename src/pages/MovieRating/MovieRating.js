@@ -9,21 +9,19 @@ const MovieRating = () => {
   const [minReviewCount, setMinReviewCount] = useState(1);
   const [ratingInfo, setRatingInfo] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
+  const [sortBy, setSortBy] = useState('name'); // 'name', 'rating-high', 'rating-low'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSearchByName = async () => {
-    if (!movieName.trim()) {
-      setError('Vui lòng nhập tên phim');
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setSearchResults([]);
 
     try {
-      const results = await searchMoviesByName(movieName.trim());
+      // Nếu không nhập gì, tìm tất cả phim (truyền ký tự rỗng hoặc ký tự đặc biệt)
+      const searchTerm = movieName.trim() || '%';
+      const results = await searchMoviesByName(searchTerm);
       if (results.length === 0) {
         setError('Không tìm thấy phim nào');
       } else {
@@ -65,18 +63,13 @@ const MovieRating = () => {
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    // Nếu có tên phim, tìm theo tên
-    if (movieName.trim()) {
+    // Nếu có tên phim hoặc không nhập gì, tìm theo tên (sẽ hiện danh sách)
+    if (movieName.trim() || !movieId.trim()) {
       handleSearchByName();
       return;
     }
 
-    // Nếu không có tên phim, tìm theo mã
-    if (!movieId.trim()) {
-      setError('Vui lòng nhập mã phim hoặc tên phim');
-      return;
-    }
-
+    // Nếu không có tên phim nhưng có mã, tìm theo mã
     setLoading(true);
     setError(null);
     setRatingInfo(null);
@@ -97,7 +90,26 @@ const MovieRating = () => {
     } finally {
       setLoading(false);
     }
-  };  const renderStars = (rating) => {
+  };
+
+  // Sắp xếp danh sách phim
+  const getSortedResults = () => {
+    if (!searchResults || searchResults.length === 0) return [];
+    
+    const sorted = [...searchResults];
+    
+    switch (sortBy) {
+      case 'rating-high':
+        return sorted.sort((a, b) => (b.AvgRating || 0) - (a.AvgRating || 0));
+      case 'rating-low':
+        return sorted.sort((a, b) => (a.AvgRating || 0) - (b.AvgRating || 0));
+      case 'name':
+      default:
+        return sorted.sort((a, b) => a.Title.localeCompare(b.Title));
+    }
+  };
+
+  const renderStars = (rating) => {
     if (!rating) return null;
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -187,17 +199,43 @@ const MovieRating = () => {
       {/* Search Results */}
       {searchResults.length > 0 && (
         <div className={`card mb-4 ${styles.searchResultsCard}`}>
-          <div className="card-header bg-info text-white">
+          <div className="card-header bg-info text-white d-flex justify-content-between align-items-center">
             <h6 className="mb-0">Kết quả tìm kiếm ({searchResults.length})</h6>
+            <div className="d-flex gap-2 align-items-center">
+              <select 
+                className="form-select form-select-sm"
+                style={{ width: 'auto' }}
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="name">Sắp xếp theo tên</option>
+                <option value="rating-high">Điểm cao → thấp</option>
+                <option value="rating-low">Điểm thấp → cao</option>
+              </select>
+              <button 
+                className="btn btn-sm btn-outline-light"
+                onClick={() => setSearchResults([])}
+              >
+                ✕ Đóng
+              </button>
+            </div>
           </div>
           <div className="list-group list-group-flush">
-            {searchResults.map((movie) => (
+            {getSortedResults().map((movie) => (
               <button
                 key={movie.MovieID}
-                className="list-group-item list-group-item-action"
+                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                 onClick={() => handleSelectMovie(movie.MovieID)}
               >
-                <strong>{movie.MovieID}</strong> - {movie.Title}
+                <div>
+                  <strong>{movie.MovieID}</strong> - {movie.Title}
+                </div>
+                <div className="d-flex align-items-center gap-2">
+                  <span className="text-warning">⭐</span>
+                  <span className="fw-bold">
+                    {(movie.AvgRating || 0).toFixed(1)} ({(movie.ReviewCount || 0)})
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -214,11 +252,24 @@ const MovieRating = () => {
       {/* Rating Info Display */}
       {ratingInfo && (
         <div className={`card ${styles.ratingCard}`}>
-          <div className="card-header bg-warning text-dark">
+          <div className="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
             <h5 className="mb-0">
               <FaStar className="me-2" />
               Thông Tin Đánh Giá
             </h5>
+            <button 
+              className="btn btn-sm btn-outline-dark"
+              onClick={() => {
+                setRatingInfo(null);
+                setMovieId('');
+                setMovieName('');
+                setError(null);
+                setSearchResults([]);
+                handleSearchByName();
+              }}
+            >
+              ✕ Đóng
+            </button>
           </div>
           <div className="card-body">
             <div className="row">
@@ -259,14 +310,6 @@ const MovieRating = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* No Data Message */}
-      {!ratingInfo && !error && !loading && (
-        <div className="text-center text-muted py-5">
-          <FaStar size={60} className="mb-3 opacity-25" />
-          <p>Nhập mã phim để xem đánh giá</p>
         </div>
       )}
     </div>
