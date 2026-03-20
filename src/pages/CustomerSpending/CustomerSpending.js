@@ -41,7 +41,7 @@ const CustomerSpending = () => {
           } else if (sqlError.includes('Invalid column name')) {
             errorMsg = 'Lỗi cấu trúc dữ liệu. Vui lòng liên hệ quản trị viên';
           } else {
-            errorMsg = 'Có lỗi xảy ra. Vui lòng thử lại';
+            errorMsg = 'Không tìm thấy khách hàng với mã này';
           }
         }
       }

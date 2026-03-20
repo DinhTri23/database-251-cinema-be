@@ -282,7 +282,7 @@ function MoviePage() {
           const sqlError = err.response.data.error || "";
           if (typeof sqlError === 'string') {
             if (sqlError.includes('Khong the xoa phim da hoac dang chieu')) {
-              errorMsg = 'Không thể xóa phim đang chiếu!'; //startdate <= today
+              errorMsg = 'Không thể xóa phim đã hoặc đang chiếu!'; //startdate <= today
             } else if (sqlError.includes('REFERENCE constraint')) {
               errorMsg = 'Không thể xóa phim vì đang có dữ liệu liên quan (vé đã bán, đánh giá,...)';
             } else {

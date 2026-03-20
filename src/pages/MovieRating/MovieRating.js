@@ -6,7 +6,7 @@ import styles from './MovieRating.module.scss';
 const MovieRating = () => {
   const [movieId, setMovieId] = useState('');
   const [movieName, setMovieName] = useState('');
-  const [minReviewCount, setMinReviewCount] = useState(1);
+  const [minRating, setMinRating] = useState(0);
   const [ratingInfo, setRatingInfo] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [sortBy, setSortBy] = useState('name'); // 'name', 'rating-high', 'rating-low'
@@ -22,10 +22,16 @@ const MovieRating = () => {
       // Nếu không nhập gì, tìm tất cả phim (truyền ký tự rỗng hoặc ký tự đặc biệt)
       const searchTerm = movieName.trim() || '%';
       const results = await searchMoviesByName(searchTerm);
-      if (results.length === 0) {
-        setError('Không tìm thấy phim nào');
+      
+      // Lọc theo điểm đánh giá tối thiểu
+      const filteredResults = results.filter(movie => 
+        (movie.AvgRating || 0) >= minRating
+      );
+      
+      if (filteredResults.length === 0) {
+        setError('Không tìm thấy phim nào phù hợp');
       } else {
-        setSearchResults(results);
+        setSearchResults(filteredResults);
       }
     } catch (err) {
       console.error(err);
@@ -44,7 +50,7 @@ const MovieRating = () => {
     setRatingInfo(null);
 
     try {
-      const data = await getMovieRatingSummary(selectedMovieId, minReviewCount);
+      const data = await getMovieRatingSummary(selectedMovieId, 0);
       setRatingInfo(data);
     } catch (err) {
       console.error(err);
@@ -76,14 +82,14 @@ const MovieRating = () => {
     setSearchResults([]);
 
     try {
-      const data = await getMovieRatingSummary(movieId.trim(), minReviewCount);
+      const data = await getMovieRatingSummary(movieId.trim(), 0);
       setRatingInfo(data);
     } catch (err) {
       console.error(err);
       if (err.response && err.response.status === 404) {
         setError('Không tìm thấy phim với mã này');
       } else if (err.response && err.response.data && err.response.data.error) {
-        setError(err.response.data.error);
+        setError('Lỗi không tìm thấy phim');
       } else {
         setError('Lỗi kết nối hoặc không tải được dữ liệu');
       }
@@ -166,13 +172,15 @@ const MovieRating = () => {
               />
             </div>
             <div className="col-md-2">
-              <label className="form-label fw-bold">Số đánh giá tối thiểu</label>
+              <label className="form-label fw-bold">Điểm tối thiểu</label>
               <input
                 type="number"
                 className="form-control"
-                min="1"
-                value={minReviewCount}
-                onChange={(e) => setMinReviewCount(parseInt(e.target.value) || 1)}
+                min="0"
+                max="10"
+                step="0.1"
+                value={minRating}
+                onChange={(e) => setMinRating(parseFloat(e.target.value) || 0)}
                 disabled={loading}
               />
             </div>
