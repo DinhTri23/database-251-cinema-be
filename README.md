@@ -1,3 +1,7 @@
+# Introduce to project 
+
+This project was developed by a group of students in the Database Systems course: Tran Dang Khoa, Vo Dinh Tri, Pham Quang Thanh, Nguyen Duc Toan, and Nguyen Chi Nhan.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
